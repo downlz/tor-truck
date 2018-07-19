@@ -4,19 +4,24 @@ module.exports = {
         message: `Hello ${req.body.email} registerd`
       })
   },
-  Allocations (req,res) {
+  newAllocations (req,res) {
       res.send({
         message: `Trying Driver between ${req.body.source} and ${req.body.destination} Allocations`
       })
   },
-  AllocHistory (req,res) {
+  getAllocations (req,res) {
       res.send({
-        message: `Shows all your recent transaction logs`
+        message: `Find Details of drivers Allocations for a given route`
       })
   },
-  Status (req,res) {
+  ownerAllocHistory (req,res) {
       res.send({
-        message: `Shows status of our current`
+        message: `Shows all your recent transaction logs for a selected owner`
       })
+  },
+  driverStatus (req,res){
+    res.send({
+      message: `Show the current driver status based on GPS`
+    })
   }
 }

@@ -1,4 +1,3 @@
-console.log('Hello')
 const express = require('express')
 const bodyParser = require('body-parser')
 const cors = require('cors')
@@ -9,8 +8,11 @@ require('./models/db')
 
 const app=express()
 app.use(morgan('combined'))
+app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json())
 app.use(cors())
 require('./routes')(app)
 
 app.listen(config.port)
+
+console.log('Tor Truck API running on: ' + config.port);

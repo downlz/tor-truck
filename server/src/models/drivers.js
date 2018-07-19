@@ -21,7 +21,7 @@ var driverSchema = new mongoose.Schema ({
   baselocation : {type : String,required : true},
   lastservedlocation : {type : String},
   zones : [String],
-  preferred_nodes : [String],
+  preferrednodes : [String],
   workTimes : workTimeSchema
 });
 

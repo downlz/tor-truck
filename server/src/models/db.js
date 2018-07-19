@@ -5,8 +5,6 @@ if (process.env.NODE_ENV === 'production') {
   dbURI = 'mongodb://admin:mevn2019@ds129811.mlab.com:29811/tortruck-dev'
 }
 
-//  require('./locations');
-//  require('./users');
 mongoose.connect(dbURI, {useNewUrlParser: true})
 mongoose.connection.on('connected', function () {
   console.log('Mongoose connected to ' + dbURI)
@@ -43,3 +41,7 @@ process.on('SIGTERM', function () {
     process.exit(0)
   })
 })
+
+require('./drivers')
+require('./network')
+require('./register')

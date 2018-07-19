@@ -12,6 +12,8 @@
         v-model = "password"
         placeholder="password" />
         <br>
+        <div class="error" v-html="error" />
+        <br>
         <button @click=register()> Register </button>
   </div>
 </template>
@@ -19,21 +21,31 @@
 <script>
 import AuthenticationService from '@/services/AuthenticationService'
 export default {
-  name: 'Register',
   data () {
     return {
       email: '',
-      password: ''
+      password: '',
+      error: null
     }
   },
   methods: {
     async register () {
-      const response = await AuthenticationService.register({
+    try {
+      await AuthenticationService.register({
         email: this.email,
         password: this.password
-      })
-      console.log(response.data)
+    })
+    } catch (error){
+      this.error = error.response.data.error
+    }
+
     }
   }
 }
 </script>
+
+<style scoped>
+.error {
+  color: red;
+}
+</style>
