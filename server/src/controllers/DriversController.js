@@ -8,26 +8,6 @@ var driNew = mongoose.model('Drivers')
 module.exports.getDriversDetails = function (req,res){
       sendJsonResponse(res, 200 ,{"status" : "success for sample API"})
 }
-/*
-module.exports.newDrivers = function (req,res) {
-
-      driNew.create({
-        drivername : req.body.drivername,
-        phone : req.body.phone,
-        address : req.body.address,
-        baselocation : req.body.baselocation,
-        lastservedlocation : req.body.lastservedlocation,
-        zones : req.body.zones,
-        preferrednodes : req.body.preferrednodes,
-        workTimes : req.body.workTimes
-      }, function(err,driversAdd){
-        if (err) {
-            sendJsonResponse(res, 400 ,err)
-        } else {
-            sendJsonResponse(res, 200 ,driversAdd)
-        }
-      })
-  } */
 
   module.exports.newDrivers = async function(req, res) {
       var driversAdd = await new driNew({
@@ -54,8 +34,45 @@ module.exports.newDrivers = function (req,res) {
         }
       });
     }
-// app.get('/test',(req,res) => {
-//  res.send({
-//    message : "Hello World"
-//  })
-// })
+
+    module.exports.updDrivers = async function(req, res) {
+      var driverId = req.params.driversId // .toString();
+      if (driverId) {
+        driNew
+          .findOne({phone : driverId}) // . findById(networkid)
+          //.select('nodes')
+          .exec((err, driver) => {
+            if (err) {
+              res
+                .status(400)
+                .json(err);
+            }
+            driver.address = req.body.address,
+            driver.baselocation = req.body.baselocation,
+            driver.lastservedlocation = req.body.lastservedlocation,
+            driver.zones = req.body.zones.split(","),
+            driver.preferrednodes = req.body.preferrednodes.split(","),
+            driver.workTimes = req.body.workTimes
+            driver.save((err, driver) => {
+              if (err) {
+                res
+                  .status(400)
+                  .json(err);
+              } else {
+                 res
+                   .status(201)
+                   .json({
+                      "message": "Updated Drivers details" + driverId
+              });
+              }
+            });
+          }
+        );
+      } else {
+        res
+          .status(404)
+          .json({
+            "message": "Not found, valid phone no required"
+          });
+      }
+    };

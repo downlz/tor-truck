@@ -12,7 +12,7 @@ var networkNodesSchema = new mongoose.Schema ({
   distance :  {type : Number,min : 0,max : 5000},
   cost : {type : Number},         // Should be true,test purpose only
   coords : {type : [Number], index : '2dsphere'},
-  createOn : {type : Date,"default" : Date.now}
+  createdOn : {type : Date,"default" : Date.now}
 });
 
 var networkPointSchema = new mongoose.Schema ({
@@ -22,7 +22,8 @@ var networkPointSchema = new mongoose.Schema ({
   loc_type : [String],
   coords : {type : [Number], index : '2dsphere',required : false},
   openingTimes : [openingTimeSchema],
-  nodes : [networkNodesSchema]
+  nodes : [networkNodesSchema],
+  createdOn : {type : Date,"default" : Date.now}
 });
 
 mongoose.model('Network',networkPointSchema);
