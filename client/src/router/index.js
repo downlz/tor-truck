@@ -11,6 +11,7 @@ import UpgradeToPRO from '@/pages/UpgradeToPRO.vue'
 import Register from '@/components/Register'
 import Allocations from '@/components/Allocations'
 import Drivers from '@/components/Drivers'
+import Network from '@/components/Network'
 
 const routes = [
   {
@@ -79,6 +80,11 @@ const routes = [
         path: '/Drivers',
         name: 'Drivers',
         component: Drivers
+      },
+      {
+        path: '/Network',
+        name: 'Network',
+        component: Network
       }
     ]
   }

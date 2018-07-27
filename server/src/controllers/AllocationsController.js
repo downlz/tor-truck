@@ -1,3 +1,6 @@
+var mongoose = require('mongoose')
+var addNewNetwork = mongoose.model('Network')
+
 module.exports = {
   register (req,res) {
       res.send({

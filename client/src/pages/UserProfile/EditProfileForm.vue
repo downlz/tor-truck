@@ -62,6 +62,11 @@
               <md-input v-model="code" type="number"></md-input>
             </md-field>
           </div>
+          <div class="md-layout-item md-small-size-100 md-size-100">
+
+            <md-switch v-model="boolean">Select Type</md-switch>
+
+          </div>
           <div class="md-layout-item md-size-100">
             <md-field maxlength="5">
               <label>About Me</label>
@@ -97,6 +102,7 @@ export default {
       city: null,
       country: null,
       code: null,
+      boolean: true,
       aboutme: "Lamborghini Mercy, Your chick she so thirsty, I'm in that two seat Lambo."
     }
   }

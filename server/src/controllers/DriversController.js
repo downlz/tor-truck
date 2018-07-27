@@ -40,11 +40,19 @@ module.exports.newDrivers = function (req,res) {
         preferrednodes : req.body.preferrednodes.split(","),
         workTimes : req.body.workTimes
       }) //req.body);
-      driversAdd.save(function(err, task) {
-        if (err)
-          res.status(400).send(err);
-        res.json(task);
-      })
+      driversAdd.save((err, task) => {
+        if (err) {
+          res
+            .status(400)
+            .json(err);
+        } else {
+           res
+             .status(201)
+             .json({
+                "message": "Success added driver added to system"
+        });
+        }
+      });
     }
 // app.get('/test',(req,res) => {
 //  res.send({
