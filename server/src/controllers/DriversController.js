@@ -1,14 +1,6 @@
 var mongoose = require('mongoose')
 var driNew = mongoose.model('Drivers')
 
-/*var sendJsonResponse = function(res,status,content){
-  res.status(status)
-  res.json(content)
-}*/
-module.exports.getDriversDetails = function (req,res){
-      sendJsonResponse(res, 200 ,{"status" : "success for sample API"})
-}
-
   module.exports.newDrivers = async function(req, res) {
       var driversAdd = await new driNew({
         drivername : req.body.drivername,
@@ -76,3 +68,9 @@ module.exports.getDriversDetails = function (req,res){
           });
       }
     };
+
+    module.exports.getDriversDetails = async function(req,res){
+      res.send({
+        message: `Trying Driver between ${req.body.source} and ${req.body.destination} Allocations`
+      })
+    }

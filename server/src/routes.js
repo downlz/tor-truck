@@ -10,7 +10,7 @@ module.exports = (app) =>{
   // Allocation Details for a owner along a route
   app.post('/Allocations',allocationsController.newAllocations)
   //app.put('/Allocations/:allocationsId',allocationsController.allocationsUpdate)
-  app.get('/Allocations/:allocationsId',allocationsController.getAllocations)
+  app.get('/Allocations/:allocationsId/destination/:destination',allocationsController.getAllocations)
   app.get('/Allocations/:ownerId/allocHistory',allocationsController.ownerAllocHistory)
   app.get('/Allocations/:allocationsId/drivers/:driverId/status',allocationsController.driverStatus)
 

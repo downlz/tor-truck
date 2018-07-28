@@ -6,7 +6,7 @@ const config = require('./config/config')
 require('./models/db')
 
 
-const app=express()
+const app = express()
 app.use(morgan('combined'))
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json())
