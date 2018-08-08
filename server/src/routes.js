@@ -6,7 +6,7 @@ const networkController = require('./controllers/NetworkController')
 
 module.exports = (app) =>{
   // Application Registration and login
-  app.post('/register',authenticationControllerPolicy.register,registerController.register)
+  //app.post('/register',authenticationControllerPolicy.register,registerController.register)
   // Allocation Details for a owner along a route
   app.post('/Allocations',allocationsController.newAllocations)
   //app.put('/Allocations/:allocationsId',allocationsController.allocationsUpdate)
@@ -18,6 +18,7 @@ module.exports = (app) =>{
   app.get('/Drivers/:driverId',driversController.getDriversDetails)
   //app.post('/Drivers',authenticationCo;ntrollerPolicy.newDrivers,driversController.newDrivers)
   app.post('/Drivers',driversController.newDrivers)
+  app.post('/Drivers/:driversId/preferrednodes',driversController.addPreferredNodes)
   app.put('/Drivers/:driversId',driversController.updDrivers)
 
   // Add Nodes in a network
@@ -26,6 +27,7 @@ module.exports = (app) =>{
   app.put('/Network/:networkId',networkController.updNetwork)
   app.put('/Network/:networkId/nodes/:nodesId',networkController.updNodes)
 
+app.get('/register/:driverId',registerController.fetchDriverList)
   // user List Routes
   // Improved Syntax
   /* app.route('/rooms')

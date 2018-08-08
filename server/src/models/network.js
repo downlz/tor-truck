@@ -16,10 +16,11 @@ var networkNodesSchema = new mongoose.Schema ({
 });
 
 var networkPointSchema = new mongoose.Schema ({
-  location : {type : String,required : true},
+  location : {type : String,required : true,unique : true},
   services : [String],
   address : String,
   loc_type : [String],
+  mainlocation : {type : Boolean, required : true,"default" : false},
   coords : {type : [Number], index : '2dsphere',required : false},
   openingTimes : [openingTimeSchema],
   nodes : [networkNodesSchema],

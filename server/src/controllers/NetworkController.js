@@ -11,6 +11,7 @@ module.exports.addNetwork = async function(req, res) {
     location: req.body.location,
     services: req.body.services.split(","),
     address: req.body.address,
+    mainlocation: req.body.mainlocation,
     coords: [parseFloat(req.body.lng), parseFloat(req.body.lat)],
     loc_type: req.body.loc_type.split(",")
   })
@@ -23,7 +24,7 @@ module.exports.addNetwork = async function(req, res) {
        res
          .status(201)
          .json({
-            "message": "Success:Added network point"
+            "message": "Success:Added network point " + req.body.location
     });
     }
   });
@@ -170,7 +171,7 @@ module.exports.updNodes = async function(req, res) {
          res
            .status(201)
            .json({
-              "message": "Success added nodes to a network"
+              "message": "Success added nodes to a network " //+ nodename
       });
       }
     });

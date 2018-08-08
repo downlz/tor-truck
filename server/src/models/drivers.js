@@ -14,14 +14,23 @@ var spiSchema = new mongoose.Schema ({
   aadharno : {type : Number,required : true}
 })
 
+// Driver Preferred routes
+var preferredNodes = new mongoose.Schema ({
+  nodestart : {type : String,required : true},
+  nodeend : String,
+  distance : {type : Number,required : true},
+  cost: {type : Number}, 
+  isactive : {type : Boolean, required : true}
+})
+
 var driverSchema = new mongoose.Schema ({
   drivername : {type : String,required : true},
-  phone : [String],
+  phone : String,
   address : String,
   baselocation : {type : String,required : true},
   lastservedlocation : {type : String},
-  zones : [String],
-  preferrednodes : [String],
+  zones : [ String ],
+  preferrednodes : [preferredNodes],
   workTimes : workTimeSchema
 });
 

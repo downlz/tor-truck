@@ -9,7 +9,6 @@ var driNew = mongoose.model('Drivers')
         baselocation : req.body.baselocation,
         lastservedlocation : req.body.lastservedlocation,
         zones : req.body.zones,
-        preferrednodes : req.body.preferrednodes.split(","),
         workTimes : req.body.workTimes
       }) //req.body);
       driversAdd.save((err, task) => {
@@ -65,6 +64,50 @@ var driNew = mongoose.model('Drivers')
           .status(404)
           .json({
             "message": "Not found, valid phone no required"
+          });
+      }
+    };
+
+    module.exports.addPreferredNodes = async function(req, res) {
+      var driverid = req.params.driversId // .toString();
+      if (driverid) {
+        driNew
+          .findOne({phone : driverid}) // . findById(networkid)
+          .select('preferrednodes')
+          .exec((err, drivers) => {
+            if (err) {
+              res
+                .status(400)
+                .json(err);
+            } else {
+              drivers.preferrednodes.push({
+                nodestart : req.body.nodestart,
+                nodeend : req.body.nodeend,
+                distance : req.body.distance,
+                cost : req.body.cost,
+                isactive : req.body.isactive
+              })
+              drivers.save((err, nodeForDriver) => {
+                if (err) {
+                  res
+                    .status(400)
+                    .json(err);
+                } else {
+                   res
+                     .status(201)
+                     .json({
+                        "message": "Add nodes to a driver " + driverid
+                });
+                }
+              });
+            }
+          }
+        );
+      } else {
+        res
+          .status(404)
+          .json({
+            "message": "Not found, networkid required"
           });
       }
     };

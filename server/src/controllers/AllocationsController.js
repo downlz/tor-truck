@@ -1,6 +1,7 @@
 var mongoose = require('mongoose')
 var networksColl = mongoose.model('Network')
 var _ = require('lodash')
+const Graph = require('node-dijkstra')
 
 module.exports = {
   register(req, res) {
@@ -28,14 +29,14 @@ module.exports = {
 module.exports.getAllocations = async function(req, res) {
   var allocId = req.params.allocationsId // .toString();
   var destination = req.params.destination
+  var nodeCost = ''
+  //var mapStart
   if (req.params && allocId && destination) {
     /*res.send({
       message: `Trying to pick up optimized route between` + allocId + ` and ` + destination
     })*/
     networksColl
-      .find({
-        location: allocId
-      })
+      .find({"$or":[{location:'Cuttack'},{location:'Kolkata'},{location:'Kharagpur'},{location:'Balasore'},{location:'Bhubaneswar'},{location:'Brahmapur'},{location:'Srikakulam'},{location:'Vizianagram'}]})
       .exec((err, network) => {
         if (err) {
           res
@@ -54,22 +55,59 @@ module.exports.getAllocations = async function(req, res) {
           //  console.log(address + ": " + network[address]);
           //  }
           //networkpoints = networkList(req,res,network)
+          //const route = new Graph(
+          var nodeName = 'Node'
+          var graph = new Map()
           network.forEach(function(doc) {
+            // Using base approach
+            /*
             nodeArray = doc.nodes
-            nodeCost = doc.location + " , " + "{ "
+            nodeCost = JSON.stringify(doc.location) + " , " + "{ "
             nodeArray.forEach(function(subDoc) {
               //console.log(subDoc.nodename + " : " + subDoc.cost)
-              nodeCost = nodeCost + subDoc.nodename + " : " + subDoc.cost + ","
+              nodeCost = nodeCost + JSON.stringify(subDoc.nodename) + " : " + subDoc.cost + ","
             })
             nodeCost = nodeCost.slice(0, -1) + " }"
             //nodeCost = nodeCost + " }"
-            console.log(nodeCost)
-            /* route.addNode('A', { B:1 })
-            route.addNode('B', { A:1, C:2, D: 4 })
+            */
+            var mapStart = doc.location
+            //console.log('Starting Element ' + mapStart)
+            // Using Graph layout
+            // nodeLink = doc.location
+            var mapStart = new Map()
+            nodeArray = doc.nodes
+            //nodeCost = nodeCost + JSON.stringify(doc.location) + " : " + "{ "
+            nodeArray.forEach(function(subDoc) {
+              //console.log(subDoc.nodename + " : " + subDoc.cost)
+              //console.log(subDoc.nodename)
+              //nodeCost = nodeCost + JSON.stringify(subDoc.nodename) + " : " + subDoc.cost + ","
+              mapStart.set(subDoc.nodename, subDoc.cost)
+            })
+            //nodeCost = nodeCost.slice(0, -1) + " },"
+            graph.set(doc.location, mapStart)
+
+            //console.log(nodeCost)
+            // route.addNode(nodeCost)
+            /*route.addNode('B', { A:1, C:2, D: 4 })
             route.addNode('C', { B:2, D:1 })
             route.addNode('D', { C:1, B:4 })
-            route.path('A', 'D') // => [ 'A', 'B', 'C', 'D' ] */
+            route.path('A', 'D') // => [ 'A', 'B', 'C', 'D' ]
           })
+          if (typeof route.path(allocId,destination) != undefined){
+
+          } else {
+            console.log("Blocked")
+          } */
+          })
+          //var obj = JSON.parse('{' + nodeCost + '}');
+         //console.log(nodeCost)
+         console.log('Trying to find route between:' + allocId + ' ' + destination)
+         const route = new Graph(graph)
+         console.log(route.path(allocId, destination,{cost:true}))
+          //const route = new Graph({
+          //  "Balasore" : { "Cuttack" : 10 },"Bhubaneswar" : { "Brahmapur" : 10 },"Brahmapur" : { "Srikakulam" : 10 },"Cuttack" : { "Bhubaneswar" : 10 },"Kharagpur" : { "Balasore" : 10 },"Kolkata" : { "Murshidabad" : 10,"Kharagpur" : 10 },"Srikakulam" : { "Vizianagram" : 10 },"Visakhapatnam" : { },"Vizianagram" : { "Visakhapatnam" : 10 },
+          //})
+          // route.path(allocId,destination)
         }
       })
   } else {
@@ -80,6 +118,7 @@ module.exports.getAllocations = async function(req, res) {
       });
   }
 }
+
 
 var networkList = function(req, res, results) {
   console.log('networkList:');
@@ -111,4 +150,36 @@ var nodeList = function(req, res, results) {
     });
   });
   return nodes;
+};
+
+const getDriversForNodes = function(req, res, network) {
+
+
+  if (!network) {
+    res
+      .status(404)
+      .json({
+        "message": "networkid not found"
+      });
+  } else {
+    network.nodes.push({
+      nodename: req.body.nodename,
+      distance: req.body.distance,
+      cost: req.body.cost,
+      coords: [parseFloat(req.body.lng), parseFloat(req.body.lat)]
+    });
+    network.save((err, network) => {
+      if (err) {
+        res
+          .status(400)
+          .json(err);
+      } else {
+        res
+          .status(201)
+          .json({
+            "message": "Success added nodes to a network"
+          });
+      }
+    });
+  }
 };
