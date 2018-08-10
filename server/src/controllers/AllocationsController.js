@@ -103,7 +103,23 @@ module.exports.getAllocations = async function(req, res) {
          //console.log(nodeCost)
          console.log('Trying to find route between:' + allocId + ' ' + destination)
          const route = new Graph(graph)
-         console.log(route.path(allocId, destination,{cost:true}))
+         var shortestRoute = route.path(allocId, destination,{cost:true})
+         // console.log(shortestRoute.path)
+         for (i=0;i<shortestRoute.path.length;i++)
+          {
+            // Find driver operating in current path
+
+            // Pull drivers whose lastservedlocation is selected path and active is shortestRoute
+
+            // For the fetched driver check if it matches the selected path and its end path equal
+            // to next element of shortestRoute.While this check is being performed validate the critera
+            // for reverse options also.
+            // Get atleast one driver.If more than two drivers are found then chooose the one with low
+            // cost.
+
+            // Cost funtion will be different for network and driver.For NEtwork it will be pulled up from
+            // Google Maps API
+          }
           //const route = new Graph({
           //  "Balasore" : { "Cuttack" : 10 },"Bhubaneswar" : { "Brahmapur" : 10 },"Brahmapur" : { "Srikakulam" : 10 },"Cuttack" : { "Bhubaneswar" : 10 },"Kharagpur" : { "Balasore" : 10 },"Kolkata" : { "Murshidabad" : 10,"Kharagpur" : 10 },"Srikakulam" : { "Vizianagram" : 10 },"Visakhapatnam" : { },"Vizianagram" : { "Visakhapatnam" : 10 },
           //})

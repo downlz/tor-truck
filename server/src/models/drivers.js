@@ -11,7 +11,7 @@ var workTimeSchema = new mongoose.Schema ({
 var spiSchema = new mongoose.Schema ({
   license : {type : String,required : true},
   family : [String],
-  aadharno : {type : Number,required : true}
+  aadharno : {type : Number,required : true,unique : true}
 })
 
 // Driver Preferred routes
@@ -19,13 +19,13 @@ var preferredNodes = new mongoose.Schema ({
   nodestart : {type : String,required : true},
   nodeend : String,
   distance : {type : Number,required : true},
-  cost: {type : Number}, 
+  cost: {type : Number},
   isactive : {type : Boolean, required : true}
 })
 
 var driverSchema = new mongoose.Schema ({
   drivername : {type : String,required : true},
-  phone : String,
+  phone : {type : String,unique : true},
   address : String,
   baselocation : {type : String,required : true},
   lastservedlocation : {type : String},
