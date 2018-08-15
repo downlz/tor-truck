@@ -48,45 +48,6 @@ const dummyFunc = function(req, res, network, driver) {
       console.log("End Reached.Relax")
     }
   }
-
-  // Validate loops for data received from mongodb
-  /*
-        if (driverId) {
-          driverDetails
-            .find({drivername:'Driver1'}) // . findById(networkid)
-            //.select('nodes')
-            .exec((err, driverDtl) => {
-              if (err) {
-                res
-                  .status(400)
-                  .json(err);
-              } else {
-                res
-                  .status(200)
-                  .json(driverDtl);
-                  driverDtl.each(function(doc) {
-                    console.log(doc.drivername)
-                  })
-            }
-          });
-        } else {
-          res
-            .status(404)
-            .json({
-              "message": "Not found, valid phone no required"
-            });
-        }
-    }
-    //
-
-     var resultArray = [];
-    driverDetails.find({drivername:'Driver1'},function(err, driverDtl) {
-          driverDtl.forEach(function(doc){
-                  resultArray.push(doc.drivername);
-              })
-      })
-      return resultArray
-      console.log(resultArray) */
   if (driverId) {
     driverDetails
       .find({}) // . findById(networkid)
@@ -105,7 +66,7 @@ const dummyFunc = function(req, res, network, driver) {
 }
 
 module.exports.fetchDriverList = async function(req, res) {
-  var driverId = req.params.driverId
+  var driverId =  req.params.driverId
   //var driverNode = []
   if (driverId) {
     driverDetails

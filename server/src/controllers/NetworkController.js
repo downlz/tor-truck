@@ -8,7 +8,7 @@ var sendJsonResponse = function(res, status, content) {
 
 module.exports.addNetwork = async function(req, res) {
   var addNetworkPoint = await new addNewNetwork({
-    location: req.body.location,
+    location: req.body.location.trim(),
     services: req.body.services.split(","),
     address: req.body.address,
     mainlocation: req.body.mainlocation,
@@ -148,7 +148,7 @@ module.exports.updNodes = async function(req, res) {
 };
 
 
-  const doAddNodes = function(req, res, network) {
+  const doAddNodes = async function(req, res, network) {
   if (!network) {
     res
       .status(404)
@@ -156,12 +156,13 @@ module.exports.updNodes = async function(req, res) {
         "message": "networkid not found"
       });
   } else {
+    //var network2 = await new network2({
     network.nodes.push({
-      nodename: req.body.nodename,
+      nodename: req.body.nodename.trim(),
       distance: req.body.distance,
       cost: req.body.cost,
       coords: [parseFloat(req.body.lng), parseFloat(req.body.lat)]
-    });
+    })
     network.save((err, network) => {
       if (err) {
         res

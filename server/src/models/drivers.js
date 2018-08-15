@@ -23,6 +23,15 @@ var preferredNodes = new mongoose.Schema ({
   isactive : {type : Boolean, required : true}
 })
 
+var driverStatus = new mongoose.Schema ({
+  isAssigned : {}.
+  lasttripstarttime :{},
+  lasttripendtime : {},
+  tripid : String,           // Attach to triplog
+  nextshift : Date,
+  nextplannedroute : {}
+})
+
 var driverSchema = new mongoose.Schema ({
   drivername : {type : String,required : true},
   phone : {type : String,unique : true},
@@ -31,7 +40,8 @@ var driverSchema = new mongoose.Schema ({
   lastservedlocation : {type : String},
   zones : [ String ],
   preferrednodes : [preferredNodes],
-  workTimes : workTimeSchema
+  workTimes : workTimeSchema,
+  driverStatus : {driverStatus}
 });
 
 mongoose.model('Drivers',driverSchema);
