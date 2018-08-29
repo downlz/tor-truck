@@ -4,7 +4,7 @@ var mongoose = require( 'mongoose' );
 // Storing Trip Zone
 var tripZone = new mongoose.Schema ({
   startzone : {type : String,required : true},
-  endzone : [String]
+  endzone : {type : String}
 })
 
 // Trip Status

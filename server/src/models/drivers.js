@@ -24,8 +24,8 @@ var preferredNodes = new mongoose.Schema ({
 })
 
 var driverStatus = new mongoose.Schema ({
-  isAssigned : {}.
-  lasttripstarttime :{},
+  isAssigned : {},
+  lasttripstarttime : {},
   lasttripendtime : {},
   tripid : String,           // Attach to triplog
   nextshift : Date,

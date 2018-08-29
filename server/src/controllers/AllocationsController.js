@@ -183,6 +183,19 @@ const fetchDriverOnPath = (path) => {
   driverDetails
     //.find({"$and":[{lastservedlocation:shortestRoute.path[i]},{}]})
     .find({"$and" : [{lastservedlocation:path},{'preferrednodes.isactive':'true'}]})
+    //db.drivers.find({"$and" : [{lastservedlocation:'Bhubaneswar'},{'preferrednodes.isactive':true}]}).sort({'preferrednodes.cost':1}).limit(1)
+    //db.drivers.find({lastservedlocation:"Bhubaneswar",'preferrednodes.nodestart':"Bhubaneswar",'preferrednodes.isactive':true},{'preferrednodes.$':3}).sort({'preferrednodes.cost':1}).pretty();
+    /*
+    db.drivers.aggregate(
+       [
+         { $match: {
+           lastservedlocation:'Bhubaneswar'
+         }},
+         { $sort: { 'preferrednodes.cost':1 } },
+         {$limit : 1}
+       ]
+    )
+    */
     .exec((err, driver) => {
       if (err) {
         console.log('None Found')
