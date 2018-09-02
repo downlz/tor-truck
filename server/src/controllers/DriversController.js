@@ -69,6 +69,7 @@ var driNew = mongoose.model('Drivers')
     };
 
     module.exports.addPreferredNodes = async function(req, res) {
+      existingRouteFound = false
       var driverid = req.params.driversId // .toString();
       if (driverid) {
         driNew
@@ -80,6 +81,13 @@ var driNew = mongoose.model('Drivers')
                 .status(400)
                 .json(err);
             } else {
+              drivers.preferrednodes.forEach(function(doc) {
+                  // console.log(doc.nodestart)// = req.body.nodestart
+                  if (doc.nodestart == req.body.nodestart && doc.nodeend == req.body.nodeend){
+                      existingRouteFound = true
+                  }
+              })
+              if (existingRouteFound == false){
               drivers.preferrednodes.push({
                 nodestart : req.body.nodestart,
                 nodeend : req.body.nodeend,
@@ -100,6 +108,13 @@ var driNew = mongoose.model('Drivers')
                 });
                 }
               });
+            } else {
+              res
+                .status(201)
+                .json({
+                   "message": "Already exists"
+           });
+            }
             }
           }
         );

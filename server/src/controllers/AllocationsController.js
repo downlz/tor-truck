@@ -1,9 +1,11 @@
 var mongoose = require('mongoose')
 var networksColl = mongoose.model('Network')
 var driverDetails = mongoose.model('Drivers')
-var _ = require('lodash')
 const Graph = require('node-dijkstra')
-const request = require("request");
+const request = require("request")
+var _ = require('lodash')
+API_KEY = 'AIzaSyDZsh4aEzGi9OXpFVjNGUoU190cJyZ5gV8'
+var currentSysTime = (new Date).getTime()
 // request("https://newsapi.org/v1/articles?source=the-next-web&sortBy=latest&apiKey={API_KEY}", function(err, res, body) {
 //     if(!err && res.statusCode == 200) { // Successful response
 //         console.log(body); // Displays the response from the API
@@ -39,50 +41,12 @@ module.exports.getAllocations = async function(req, res) {
     var allocId = req.params.allocationsId // .toString();
     var destination = req.params.destination
     var nodeCost = ''
-    API_KEY = 'AIzaSyDZsh4aEzGi9OXpFVjNGUoU190cJyZ5gV8'
-    //Testing Google Map Api
-
-    request("https://maps.googleapis.com/maps/api/distancematrix/json?units=metric&origins=Mumbai,IN&destinations=New+Delhi,IN&arrival_time=1534295980&transit_mode=bus&key="+API_KEY, function(err, res, body) {
-        if(!err && res.statusCode == 200) { // Successful response
-            //console.log(JSON.parse(body)); // Displays the response from the API
-            console.log(body);
-        } else {
-            console.log(err);
-        }
-    });
-
+    console.log('Route driver allocation between ' + allocId + ' and ' + destination )
     if (req.params && allocId && destination) {
       /*res.send({
         message: `Trying to pick up optimized route between` + allocId + ` and ` + destination
       })*/
       networksColl
-        // .find({
-        //   "$or": [{
-        //       location: 'Cuttack'
-        //     },
-        //     {
-        //       location: 'Kolkata'
-        //     },
-        //     {
-        //       location: 'Kharagpur'
-        //     },
-        //     {
-        //       location: 'Balasore'
-        //     },
-        //     {
-        //       location: 'Bhubaneswar'
-        //     },
-        //     {
-        //       location: 'Brahmapur'
-        //     },
-        //     {
-        //       location: 'Srikakulam'
-        //     },
-        //     {
-        //       location: 'Vizianagram'
-        //     }
-        //   ]
-        // })
         .find({})
         .exec((err, network) => {
           if (err) {
@@ -123,7 +87,7 @@ module.exports.getAllocations = async function(req, res) {
                //var resultFetch = fetchDriverOnPath(selectedPath[i])
                //console.log(fetchDriverOnPath(selectedPath[i]))
                shortestFetchedRoute(selectedPath).then((driver) => {
-                 console.log(driver);
+                 // console.log(driver);
                }).catch((e) => {
                  console.log(e)
                })
@@ -143,7 +107,10 @@ module.exports.getAllocations = async function(req, res) {
             // Google Maps API
           //} //End of for loop
         }
+
       })
+      const finalRouteTime = await getRouteTimeDistance(allocId, destination)
+      console.log('Actual Travel Time ' + JSON.parse(finalRouteTime).rows[0].elements[0].duration.text + ' with additional buffer time and n hops')
     } else {
       res
         .status(404)
@@ -162,29 +129,123 @@ module.exports.getAllocations = async function(req, res) {
 
 const shortestFetchedRoute = async (sRoute) => {
   //return new Promise((resolve,reject) => {
+    var selectedRouteArray = []
     var user='Test'
-    for (i=0;i < sRoute.length;i++){
-      const setDriver = await fetchDriverOnPath(sRoute[i])
+    var oldCost = 1000
+    var currentCost = 0
+    var driverAllocated = ''
+    var allocPhone = ''
+    var lastSL = ''
+    var isOrigin
+    var tripStartEpochTime = currentSysTime
+    var totalTravelTime = 0
+    for (i=0;i < sRoute.length - 1;i++){
+      const routeTime = await getRouteTimeDistance(sRoute[i],sRoute[i+1])
+      selectedRouteArray.push(routeTime)
+      var routeTimeJSON = JSON.parse(routeTime)
+      // console.log(routeTimeJSON.rows[0].elements[0].duration.text)
+      const setDriver = await fetchDriverOnPath(sRoute[i],sRoute[i+1])
+      // console.log(_.find(setDriver,{"preferrednodes.isactive": true}))
+      var driverSelectionArray = [];
+      driverAllocated = ''
+      allocPhone = ''
+      lastSL = ''
+      oldCost = 1000
       setDriver.forEach(function(doc){
-        console.log(sRoute[i] + " => Driver Assigned:"  + doc.phone + " " + doc.drivername + " " + doc.lastservedlocation)
+        //driver.forEach(function(doc){
+             // console.log(doc.phone + " " + doc.drivername + " " + doc.preferrednodes)
+             // activeRoutes = _.find(doc.preferrednodes,{'isactive': true})
+             // console.log(activeRoutes)
+             //console.log(_.orderBy(doc.preferrednodes,['cost'],['asc']))
+             doc.preferrednodes.forEach(function(_doc){
+                 if ((_doc.nodestart == sRoute[i] || _doc.nodestart == sRoute[i+1]) && (_doc.nodeend == sRoute[i] || _doc.nodeend == sRoute[i+1]) && _doc.isactive == true) {
+               //   driverSelectionArray.push({
+                    _id = doc._id,
+                    name = doc.drivername,
+                    phone = doc.phone,
+                    cost = _doc.cost
+                    lastSL = doc.lastservedlocation
+
+                    // Fix to apply logic in case no results is returned.It is possible route exits but no driver exits or vice versa
+                    // Currently if no next driver found old driver continues to remained assigned
+               // })
+             }
+           })
+
+           currentCost = cost
+           if (currentCost <= oldCost){
+             driverAllocated = name
+             allocPhone = phone
+           } else {
+             // Do Nothing
+           }
+           oldCost = currentCost //Assigning new old cost
+
+           //console.log(_.minBy(driverSelectionArray, 'cost'))
+          // console.log(driverSelectionArray)
       })
+      if (sRoute[i]){
+        if (!isOrigin){
+          console.log('Trip Start Time:'+ new Date(currentSysTime))
+          isOrigin = 'Y'
+        } else {
+          // console.log(typeof(routeTimeJSON.rows[0].elements[0].duration.value))
+          tripStartEpochTime = tripStartEpochTime + lastRouteTravelTime*1000 + 3600*1000
+          // console.log(tripStartEpochTime)
+          console.log('Trip Start Time:'+ new Date(tripStartEpochTime)) //Start time + duration of travel + buffer time
+        }
+      console.log(sRoute[i] + " => Driver Assigned:"  + driverAllocated + " " + allocPhone + " " + lastSL)
+      console.log('Estimated Travel Time of '+routeTimeJSON.rows[0].elements[0].duration.text + " for " + routeTimeJSON.rows[0].elements[0].distance.text)
+      lastRouteTravelTime = routeTimeJSON.rows[0].elements[0].duration.value
+      totalTravelTime = totalTravelTime + lastRouteTravelTime
+      driverAllocated = ''
+      allocPhone = ''
+      lastSL = ''
+      oldCost = 1000
     }
-  //   if (user){
-  //     resolve(user)
-  //   } else {
-  //     reject(user)
-  //   }
-  // })
+  }
+  console.log('Trip Schedule, Start at '+ new Date(currentSysTime) + 'Scheduled to arrive at ' + new Date(tripStartEpochTime + lastRouteTravelTime*1000))
+  // console.log('Expected Travel Time ' + Math.abs(((tripStartEpochTime + lastRouteTravelTime*1000) - currentSysTime))/3600000)
+  // console.log(selectedRouteArray)
 }
 
-const fetchDriverOnPath = (path) => {
+const getRouteTimeDistance = (routeOrigin,routeDestination) => {
+  return new Promise((resolve,reject) => {
+    request("https://maps.googleapis.com/maps/api/distancematrix/json?units=metric&origins="+routeOrigin+",IN&destinations="+routeDestination+",IN&arrival_time="+currentSysTime+"&transit_mode=bus&key="+API_KEY, function(err, res, body) {
+        if(!err && res.statusCode == 200) { // Successful response
+            //console.log(JSON.parse(body)); // Displays the response from the API
+            //console.log(body);
+            resolve(body)
+        } else {
+            reject('Unable to get route details')
+        }
+    })
+  })
+}
+
+const fetchDriverOnPath = (path,movingTo) => {
   return new Promise((resolve,reject) => {
     //var driver
+    if (movingTo){
+        console.log(path + "-" + movingTo)
+      }
   driverDetails
     //.find({"$and":[{lastservedlocation:shortestRoute.path[i]},{}]})
-    .find({"$and" : [{lastservedlocation:path},{'preferrednodes.isactive':'true'}]})
+    .find({$and : [{lastservedlocation:path},{'preferrednodes.isactive':true}]})
     //db.drivers.find({"$and" : [{lastservedlocation:'Bhubaneswar'},{'preferrednodes.isactive':true}]}).sort({'preferrednodes.cost':1}).limit(1)
     //db.drivers.find({lastservedlocation:"Bhubaneswar",'preferrednodes.nodestart':"Bhubaneswar",'preferrednodes.isactive':true},{'preferrednodes.$':3}).sort({'preferrednodes.cost':1}).pretty();
+    /* 1st Sep 2018
+    .find({lastservedlocation:"Bhubaneswar"},{drivername:1,lastservedlocation:1,preferrednodes:1,preferrednodes:{$elemMatch:
+                          {
+                            nodeend:{"$in":["Bhubaneswar","Brahmapur"]},
+                            nodestart:{"$in":["Bhubaneswar","Brahmapur"]},
+                            isactive : "true"
+                          }
+                        }})//.pretty();
+
+    //  this will return list of valid driver in the route.Apply rules to select one driver based on this result and pass it to output.
+    //  */
+    //.find({lastservedlocation:path},{drivername:1,phone:1,lastservedlocation:1,preferrednodes:{"$elemMatch":{nodeend:{"$in":[path,movingTo]},nodestart:{"$in":[path,movingTo]},isactive : false}}})
     /*
     db.drivers.aggregate(
        [
@@ -200,10 +261,8 @@ const fetchDriverOnPath = (path) => {
       if (err) {
         console.log('None Found')
       } else {
+        //console.log(driver.preferrednodes.nodeend)
         // console.log('Found')
-        // driver.forEach(function(doc){
-        //   console.log(doc.phone + " " + doc.drivername + " " + doc.lastservedlocation)
-        // })
         if (driver){
           resolve(driver)
         } else {
