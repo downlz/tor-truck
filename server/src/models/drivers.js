@@ -25,12 +25,24 @@ var preferredNodes = new mongoose.Schema ({
 // preferredNodes.index({nodestart: 1, nodeend: 1,type: -1})
 
 var driverStatus = new mongoose.Schema ({
-  isAssigned : {},
-  lasttripstarttime : {},
-  lasttripendtime : {},
+  isonactivetrip : {type : Boolean, "default" : false},
+  lasttripstarttime : Date,
+  lasttripendtime : Date,
+  lastservedlocation : String,
+  currenttripstarttime : Date,
+  currenttripendtime : Date,
   tripid : String,           // Attach to triplog
   nextshift : Date,
+  currentlocation : {type : String},      // Update in realtime
   nextplannedroute : {}
+})
+
+var driverTripLog = new mongoose.Schema ({
+  tripid : String,
+  tripstarttime : Date,
+  tripendtime : Date,
+  routestart : String,
+  routeend : String
 })
 
 var driverSchema = new mongoose.Schema ({
@@ -38,11 +50,13 @@ var driverSchema = new mongoose.Schema ({
   phone : {type : String,unique : true},
   address : String,
   baselocation : {type : String,required : true},
-  lastservedlocation : {type : String},
+  lastservedlocation : {type : String},           // To be updated once driver completes his trip, can also be updated based on trip allocation
   zones : [ String ],
   preferrednodes : [preferredNodes],
   workTimes : workTimeSchema,
-  driverStatus : {driverStatus}
+  driverStatus : {driverStatus},
+  isassigned : {type : Boolean, "default" : false,required : true },
+  triplogs : [driverTripLog]            // Pull user details from triplog
 })
 //driverSchema.index({phone: 1, preferrednodes.nodestart: 1,'preferrednodes.nodeend': 1}, {unique: true})
 

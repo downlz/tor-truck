@@ -3,6 +3,7 @@ const driversController = require('./controllers/DriversController')
 const authenticationControllerPolicy = require('./policies/AuthenticationControllerPolicy')
 const registerController = require('./controllers/RegisterController')
 const networkController = require('./controllers/NetworkController')
+const tripController = require('./controllers/TripController')
 
 module.exports = (app) =>{
   // Application Registration and login
@@ -10,9 +11,14 @@ module.exports = (app) =>{
   // Allocation Details for a owner along a route
   app.post('/Allocations',allocationsController.newAllocations)
   //app.put('/Allocations/:allocationsId',allocationsController.allocationsUpdate)
-  app.get('/Allocations/:allocationsId/destination/:destination',allocationsController.getAllocations)
+  app.get('/Allocations/:allocationsId/destination/:destination/tripdate/:tripdate',allocationsController.getAllocations)
+  app.get('/Allocations/:allocationsId/destination/:destination/confirm/:isConfirm',allocationsController.confirmAllocation)
   app.get('/Allocations/:ownerId/allocHistory',allocationsController.ownerAllocHistory)
   app.get('/Allocations/:allocationsId/drivers/:driverId/status',allocationsController.driverStatus)
+  app.get('/Allocations/:allocationsId/drivers/:driverId/status',allocationsController.driverStatus)
+
+  app.get('/Trip/:tripid/status/:stat',tripController.tripStatus)
+  app.get('/Trip/:tripid/finish',tripController.tripComplete)
 
   // Driver Route Requests
   app.get('/Drivers/:driverId',driversController.getDriversDetails)

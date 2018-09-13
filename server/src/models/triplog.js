@@ -9,22 +9,24 @@ var tripZone = new mongoose.Schema ({
 
 // Trip Status
 var tripStatus = new mongoose.Schema ({
-  requestedon : {type : String,required : false},
-  isconfirmed : String,
-  confirmedon : {type : Number,required : false},
+  requestedon : Date,
+  isconfirmed : {type : Boolean, "default" : false},
+  confirmedon : Date,
+  isontrip : {type : Boolean, "default" : false},
   currentlocation : {type : String},
   lastKnownlocation : {type : String}, //{type : [Number], index : '2dsphere',required : false},
   currentassigneddriver : {type : String},
-  nextdssigneddriver : {type : String},
-  previousdssigneddriver : {type : String},
+  nextassigneddriver : {type : String},
+  previousassigneddriver : {type : String},
   eta : Date
 })
 
 // Main Trip Schema
 var tripSchema = new mongoose.Schema ({
-  tripid = String,
-  selectedRoute : {type : String,required : true},
-  assignedDrivers : {type : String,unique : true},
+  tripid : String,
+  assignedRouteDrivers : [],
+  tripstarttime : Date,
+  tripeta : Date,
   cost : String,
   zones : {tripZone},
   tripstatus : {tripStatus}

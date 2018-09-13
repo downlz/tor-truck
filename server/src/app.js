@@ -4,7 +4,7 @@ const cors = require('cors')
 const morgan = require('morgan')
 const config = require('./config/config')
 require('./models/db')
-
+process.env.TZ = 'Asia/Kolkata'
 
 const app = express()
 app.use(morgan('combined'))
