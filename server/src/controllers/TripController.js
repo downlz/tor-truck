@@ -3,6 +3,7 @@ var tripLog = mongoose.model('Trip')
 
 module.exports.tripStatus = async function(req, res) {
   val = req.params.stat
+  console.log(process.env.API_KEY)
   res.send({
     message: `Shows tripSatus` + val
   })

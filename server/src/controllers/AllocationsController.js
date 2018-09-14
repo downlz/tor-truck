@@ -2,13 +2,15 @@ var mongoose = require('mongoose')
 var networksColl = mongoose.model('Network')
 var driverDetails = mongoose.model('Drivers')
 var tripLog = mongoose.model('Trip')
-process.env.TZ = 'Asia/Kolkata'
 const Graph = require('node-dijkstra')
 const request = require("request")
+
+// var moment = require('moment-timezone')
+// moment.tz.setDefault("America/Los_Angeles")
+
 //import child_process module
 const child_process = require("child_process");
 var _ = require('lodash')
-API_KEY = 'AIzaSyDZsh4aEzGi9OXpFVjNGUoU190cJyZ5gV8'
 var currentSysTime = (new Date).getTime()
 driverSelectedForRoute = []
 var allocJSON
@@ -75,8 +77,8 @@ module.exports.confirmAllocation = async function(req, res) {
 module.exports.getAllocations = async function(req, res,callback) {
     var allocId = req.params.allocationsId // .toString();
     var destination = req.params.destination
-    var tripdate = currentSysTime + 12*3600*1000      //planning all trips 12 hrs from now.
-    console.log(new Date(tripdate)) // Printing GMT Time
+    // var tripdate = currentSysTime + 12*3600*1000      //planning all trips 12 hrs from now.
+    // console.log(new Date(tripdate)) // Printing GMT Time
     var nodeCost = ''
     console.log('Route driver allocation between ' + allocId + ' and ' + destination )
     if (req.params && allocId && destination) {
@@ -297,7 +299,7 @@ const shortestFetchedRoute = async function(sRoute,sysTripId,callback) {
 
 const getRouteTimeDistance = (routeOrigin,routeDestination) => {
   return new Promise((resolve,reject) => {
-    request("https://maps.googleapis.com/maps/api/distancematrix/json?units=metric&origins="+routeOrigin+",IN&destinations="+routeDestination+",IN&arrival_time="+currentSysTime+"&transit_mode=bus&key="+API_KEY, function(err, res, body) {
+    request("https://maps.googleapis.com/maps/api/distancematrix/json?units=metric&origins="+routeOrigin+",IN&destinations="+routeDestination+",IN&arrival_time="+currentSysTime+"&transit_mode=bus&key="+process.env.API_KEY, function(err, res, body) {
         if(!err && res.statusCode == 200) { // Successful response
             //console.log(JSON.parse(body)); // Displays the response from the API
             //console.log(body);

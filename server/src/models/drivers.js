@@ -51,6 +51,7 @@ var driverSchema = new mongoose.Schema ({
   address : String,
   baselocation : {type : String,required : true},
   lastservedlocation : {type : String},           // To be updated once driver completes his trip, can also be updated based on trip allocation
+  lastservedason : Date,
   zones : [ String ],
   preferrednodes : [preferredNodes],
   workTimes : workTimeSchema,
