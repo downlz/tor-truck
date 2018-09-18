@@ -19,7 +19,7 @@ var preferredNodes = new mongoose.Schema ({
   nodestart : {type : String,required : true,index: true},
   nodeend : {type : String,required : true,index: true},
   distance : {type : Number,required : true},
-  cost: {type : Number},
+  cost: {type : Number},                          // Cost parameter will help to move drivers to his home location
   isactive : {type : Boolean, required : true}
 })
 // preferredNodes.index({nodestart: 1, nodeend: 1,type: -1})
@@ -50,13 +50,13 @@ var driverSchema = new mongoose.Schema ({
   phone : {type : String,unique : true},
   address : String,
   baselocation : {type : String,required : true},
-  lastservedlocation : {type : String},           // To be updated once driver completes his trip, can also be updated based on trip allocation
-  lastservedason : Date,
+  lastservedlocation : {type : String,required : true}, // To be updated once driver completes his trip, can also be updated based on trip allocation
+  lastservedason : {type : Date,default: +new Date()},  // To be updated based on trip allocation
   zones : [ String ],
   preferrednodes : [preferredNodes],
   workTimes : workTimeSchema,
   driverStatus : {driverStatus},
-  isassigned : {type : Boolean, "default" : false,required : true },
+  isassigned : {type : Boolean, "default" : false},
   triplogs : [driverTripLog]            // Pull user details from triplog
 })
 //driverSchema.index({phone: 1, preferrednodes.nodestart: 1,'preferrednodes.nodeend': 1}, {unique: true})

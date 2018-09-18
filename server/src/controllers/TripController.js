@@ -3,7 +3,6 @@ var tripLog = mongoose.model('Trip')
 
 module.exports.tripStatus = async function(req, res) {
   val = req.params.stat
-  console.log(process.env.API_KEY)
   res.send({
     message: `Shows tripSatus` + val
   })
@@ -11,8 +10,6 @@ module.exports.tripStatus = async function(req, res) {
 
 module.exports.tripComplete = async function(req, res) {
   res.send({
-    message: `Marks trip to complete`
+    message: `Shows tripSatus Complete`
   })
-  // Based on tripeta mark trip request as complete.
-  // Release driver assigned so that they can be assigned to other routes.
 }

@@ -16,6 +16,7 @@ module.exports = (app) =>{
   app.get('/Allocations/:ownerId/allocHistory',allocationsController.ownerAllocHistory)
   app.get('/Allocations/:allocationsId/drivers/:driverId/status',allocationsController.driverStatus)
   app.get('/Allocations/:allocationsId/drivers/:driverId/status',allocationsController.driverStatus)
+  app.get('/Allocations/tripConfirmJob',allocationsController.tripConfirmJob)
 
   app.get('/Trip/:tripid/status/:stat',tripController.tripStatus)
   app.get('/Trip/:tripid/finish',tripController.tripComplete)
