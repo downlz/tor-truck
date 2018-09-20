@@ -15,7 +15,7 @@ var _ = require('lodash')
 var currentSysTime = (new Date).getTime() + 24*3600*1000
 var maxTripTime = (new Date).getTime() + 7*24*3600*1000
 
-var dateForOneDay = (new Date).getTime() + 3*24*3600*1000
+var dateForOneDay = (new Date).getTime() + 6*24*3600*1000
 
 // var currentSysTime = ''
 driverSelectedForRoute = []
@@ -572,6 +572,7 @@ const addTripLog = (tripJSON) => {
                 if (err) {
                   reject(err)
                 } else {
+                  console.log("Trip Log Saved")
                   resolve(outMsg)
                 }
               })
@@ -584,7 +585,7 @@ const addTripLog = (tripJSON) => {
 
   module.exports.tripConfirmJob = async function(req, res) {
     tripLog
-    .find({$and : [{tripstarttime :{ $lt : new Date(dateForOneDay)}},{'tripstatus.isconfirmed':false}]}) //Very important select driver based on trip request date
+    .findOne({$and : [{tripstarttime :{ $lt : new Date(dateForOneDay)}},{'tripstatus.isconfirmed':false}]}) //Very important select driver based on trip request date
     .exec((err, tripConfirm) => {
       if (err) {
         console.log('No trips for confirmation found.Relaxxx')
@@ -599,53 +600,45 @@ const addTripLog = (tripJSON) => {
     })
   }
 
-  const tripConfirmIDs = (idsToConfirm) => {
-      idsToConfirm.forEach(async function(doc){
-      console.log(doc.tripid)
-      var allocId = doc.triproutestart
-      var destination = doc.triprouteend
-      var tripSDate = new Date(doc.tripstarttime) // Your timezone!
+  const tripConfirmIDs = async function(idsToConfirm) {
+
+      var allocId = idsToConfirm.triproutestart
+      var destination = idsToConfirm.triprouteend
+      var tripSDate = new Date(idsToConfirm.tripstarttime) // Your timezone!
       var tripEpoch = tripSDate.getTime()/1000.0
-      console.log(tripEpoch)
       const allocatedRoutePlan = await callAllocationAPI(allocId, destination,tripEpoch)
       var allocJSONToSave = JSON.parse(allocatedRoutePlan)
-      // console.log(allocJSONToSave)
-      if (allocJSONToSave){
-        console.log("inner block")
-      // const tripLogSavedToDB = await addTripLog(allocJSONToSave)  // Add to trip console.log();
-      // save driver status in db
-      // if (tripLogSavedToDB.tripstatus.isconfirmed == true){
-      // tripLogSavedToDB.assignedRouteDrivers.forEach(async function(val) {
-      //   // console.log(val)
-      //   const saveDriverTripLog = await addDriverTripLog(allocJSONToSave.tripid,val)
-      //   console.log(allocJSONToSave.tripid)
-      // })
-      //
-      //   if (tripLogSavedToDB){
-      //     console.log("Trip Log saved")
-      //   } else {
-      //     res
-      //       .status(404)
-      //       .json({
-      //         "message": "No Allocation is requested"
-      //       });
-      // }
-      // }
-      }
-
+      // //console.log(allocJSONToSave)
+      if (allocJSONToSave && allocJSONToSave != 'ERROR'){
+      //   console.log("inner block")
+      const tripLogSavedToDB = await addTripLog(allocJSONToSave)  // Add to trip console.log();
+      console.log(tripLogSavedToDB.tripid)
+      if (tripLogSavedToDB.tripstatus.isconfirmed == true){
+      tripLogSavedToDB.assignedRouteDrivers.forEach(async function(val) {
+        const saveDriverTripLog = await addDriverTripLog(allocJSONToSave.tripid,val)
+        // console.log(allocJSONToSave.tripid)
       })
-  }
+        if (tripLogSavedToDB){
+          console.log("Trip Log saved for driver")
+        } else {
+          res
+            .status(404)
+            .json({
+              "message": "No Allocation is requested"
+            })
+      }
+    }
+    }
+    }
 
-  const callAllocationAPI = (routeOrigin,routeDestination,tripDate) => {
+  var callAllocationAPI = (routeOrigin,routeDestination,tripDatePlan) => {
   return new Promise((resolve,reject) => {
-  request("http://localhost:8081/Allocations/"+routeOrigin+"/destination/"+routeDestination+"/tripdate/"+tripDate, function(err, res, body) {
+  request("http://localhost:8081/Allocations/"+routeOrigin+"/destination/"+routeDestination+"/tripdate/"+tripDatePlan, function(err, res, body) {
       if(!err && res.statusCode == 200) { // Successful response.Date passes in above API is in GMT zone.
-          //console.log(JSON.parse(body)); // Displays the response from the API
-          //console.log(body);
-          resolve(body)
+          resolve (body)
       } else {
-          reject('Unable to get route allocation')
+          reject('ERROR')      // Catch error if API trip date already passed.
       }
   })
-  })
-  }
+})
+}
