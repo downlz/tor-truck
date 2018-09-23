@@ -7,6 +7,7 @@
     padding: 20px 15px;
     line-height: 20px;
     margin-bottom: 20px;
+    z-index: 99999 !important;
 
     .notifications &{
       margin-bottom: 0;
@@ -22,22 +23,32 @@
 
     &.alert-info{
       @include alert-color(lighten($brand-info,5%));
+      @include alert-icon-color($brand-info);
     }
 
     &.alert-danger{
       @include alert-color(lighten($brand-danger,5%));
+      @include alert-icon-color($brand-danger);
     }
 
     &.alert-primary{
       @include alert-color(lighten($brand-primary,5%));
+      @include alert-icon-color($brand-primary);
     }
 
     &.alert-warning{
       @include alert-color(lighten($brand-warning,5%));
+      @include alert-icon-color($brand-warning);
     }
 
     &.alert-success{
       @include alert-color(lighten($brand-success,5%));
+      @include alert-icon-color($brand-success);
+    }
+
+    &.alert-rose{
+      @include alert-color(lighten($brand-rose,5%));
+      @include alert-icon-color($brand-rose);
     }
 
 
@@ -64,12 +75,16 @@
     }
 
     i[data-notify="icon"] {
-        font-size: 30px;
-        display: block;
-        left: 15px;
-        position: absolute;
-        top: 50%;
-        margin-top: -15px;
+      display: block;
+      left: 15px;
+      position: absolute;
+      margin-top: -39px;
+      font-size: 20px;
+      background-color: #fff;
+      padding: 9px;
+      border-radius: 50%;
+      max-width: 38px;
+      box-shadow: 0 16px 38px -12px rgba(0,0,0,.56), 0 4px 25px 0 rgba(0,0,0,.12), 0 8px 10px -5px rgba(0,0,0,.2);
     }
 
     span{
@@ -91,5 +106,6 @@
 }
 
 .alert.alert-with-icon {
+  margin-top: 43px;
     padding-left: 65px;
 }

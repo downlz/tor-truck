@@ -2,6 +2,7 @@ var mongoose = require('mongoose')
 var networksColl = mongoose.model('Network')
 var driverDetails = mongoose.model('Drivers')
 var tripLog = mongoose.model('Trip')
+var schedule = require('node-schedule');
 
 const Graph = require('node-dijkstra')
 const request = require("request")
@@ -252,7 +253,20 @@ const shortestFetchedRoute = async function(sRoute,sysTripId,tripDate,callback) 
       selectedRouteArray.push(routeTime)
       var routeTimeJSON = JSON.parse(routeTime)
       // console.log(routeTimeJSON.rows[0].elements[0].duration.text)
-      const setDriver = await fetchDriverOnPath(sRoute[i],sRoute[i+1],tripDate)
+
+      if (sRoute[i]){
+        if (!isOrigin){
+          tripStartEpochTime  = tripDate
+          // console.log('Trip Start Time:'+ new Date(currentSysTime))
+          isOrigin = 'Y'
+        } else {
+          // console.log(typeof(routeTimeJSON.rows[0].elements[0].duration.value))
+          tripStartEpochTime = tripStartEpochTime + lastRouteTravelTime*1000 + 3600*1000
+          // console.log(tripStartEpochTime)
+          // console.log('Trip Start Time:'+ new Date(tripStartEpochTime)) //Start time + duration of travel + buffer time
+        }
+
+      const setDriver = await fetchDriverOnPath(sRoute[i],sRoute[i+1],new Date(tripStartEpochTime + routeTimeJSON.rows[0].elements[0].duration.value*1000))
       // console.log(_.find(setDriver,{"preferrednodes.isactive": true}))
       // console.log(setDriver);
       var driverSelectionArray = []
@@ -260,6 +274,7 @@ const shortestFetchedRoute = async function(sRoute,sysTripId,tripDate,callback) 
       allocPhone = ''
       lastSL = ''
       oldCost = 1000
+      cost = 0
       gotDriverForNode = false
       driverKount = 0
       setDriver.forEach(function(doc){
@@ -290,6 +305,7 @@ const shortestFetchedRoute = async function(sRoute,sysTripId,tripDate,callback) 
                  name = ''
                  phone = ''
            }
+           // if (cost){
            currentCost = cost
            if (currentCost <= oldCost){
              driverAllocated = name
@@ -300,21 +316,11 @@ const shortestFetchedRoute = async function(sRoute,sysTripId,tripDate,callback) 
              // allocPhone = ''
            }
            oldCost = currentCost //Assigning new old cost
-
+         // }
            //console.log(_.minBy(driverSelectionArray, 'cost'))
           // console.log(driverSelectionArray)
       })
-      if (sRoute[i]){
-        if (!isOrigin){
-          tripStartEpochTime  = tripDate
-          // console.log('Trip Start Time:'+ new Date(currentSysTime))
-          isOrigin = 'Y'
-        } else {
-          // console.log(typeof(routeTimeJSON.rows[0].elements[0].duration.value))
-          tripStartEpochTime = tripStartEpochTime + lastRouteTravelTime*1000 + 3600*1000
-          // console.log(tripStartEpochTime)
-          // console.log('Trip Start Time:'+ new Date(tripStartEpochTime)) //Start time + duration of travel + buffer time
-        }
+
       // const finalRouteTime = await addTripLog(sysTripId.tripid,sRoute[i],sRoute[i+1],driverAllocated)
 
       var selectedDriver = {
@@ -599,6 +605,10 @@ const addTripLog = (tripJSON) => {
       }
     })
   }
+
+  // var jj = schedule.tripConfirmJob('42 * * * *', function(req,res){
+  //   console.log("Job Ran")
+  // })
 
   const tripConfirmIDs = async function(idsToConfirm) {
 

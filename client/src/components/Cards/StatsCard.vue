@@ -1,12 +1,8 @@
 <template>
   <md-card class="md-card-stats">
-    <md-card-header :data-background-color="dataBackgroundColor">
+    <md-card-header class="md-card-header-icon" :class="getClass(headerColor)">
       <slot name="header"></slot>
     </md-card-header>
-
-    <md-card-content>
-      <slot name="content"></slot>
-    </md-card-content>
 
     <md-card-actions md-alignment="left">
       <slot name="footer"></slot>
@@ -17,9 +13,14 @@
 export default {
   name: 'stats-card',
   props: {
-    dataBackgroundColor: {
+    headerColor: {
       type: String,
       default: ''
+    }
+  },
+  methods: {
+    getClass: function(headerColor){
+      return 'md-card-header-'+ headerColor + ''
     }
   }
 }

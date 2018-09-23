@@ -1,3 +1,8 @@
+.md-layout,
+.md-layout-item{
+  width: 100%;
+}
+
 .md-layout-item{
   padding-right: 15px;
   padding-left: 15px;
@@ -25,7 +30,7 @@
 #map {
     position: relative;
     width: 100%;
-    height: calc(100vh - 60px);
+    height: calc(100% - 60px);
 }
 
 .places-buttons .btn {
@@ -66,4 +71,35 @@
 
 .tim-row h3 {
     margin-top: 0;
+}
+
+.md-offset {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: auto !important;
+}
+
+@media (min-width: 576px) {
+  .md-offset {
+      max-width: 540px;
+  }
+}
+
+@media (min-width: 768px) {
+  .md-offset {
+      max-width: 720px;
+  }
+}
+
+@media (min-width: 992px) {
+  .md-offset {
+      max-width: 960px;
+  }
+}
+
+@media (min-width: 1200px) {
+  .md-offset {
+      max-width: 1140px;
+  }
 }

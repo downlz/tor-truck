@@ -108,7 +108,7 @@ export default {
   .alert {
     z-index: 100;
     cursor: pointer;
-    position: absolute;
+    position: fixed;
     width: 41%;
 
     &.center {
@@ -119,6 +119,13 @@ export default {
       margin: 0 auto;
 
     }
+
+    &.left,
+    &.right,
+    &.center{
+      margin-top: 10px;
+    }
+
     &.left {
       left: 20px;
     }

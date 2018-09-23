@@ -2,7 +2,7 @@
     border: none;
     border-radius: $border-radius-base;
     position: relative;
-    margin: 10px 1px;
+    margin: .3125rem 1px;
     height: auto;
     line-height: 1.42857;
 
@@ -10,6 +10,8 @@
     font-weight: 400;
     text-transform: uppercase;
     letter-spacing: 0;
+
+    @include social-buttons();
 
     will-change: box-shadow, transform;
     transition: box-shadow 0.2s $mdb-animation-curve-fast-out-linear-in,
@@ -36,6 +38,16 @@
       display: none;
     }
 
+    i{
+      width: 24px;
+      min-width: 24px;
+    }
+
+    &.md-white {
+      @include btn-styles($white-color);
+      box-shadow: none;
+    }
+
     &,
     &.md-default{
         @include btn-styles($gray-light);
@@ -56,18 +68,8 @@
     &.md-danger{
       @include btn-styles($brand-danger);
     }
-    &.md-white{
-        &,
-        &:focus,
-        &:hover{
-            background-color: $white-color;
-            color: $gray-light;
-        }
-        &.btn-simple{
-            color: #FFFFFF;
-            background: transparent;
-            box-shadow: none;
-        }
+    &.md-rose{
+      @include btn-styles($brand-rose);
     }
 
     &:focus,
@@ -76,7 +78,9 @@
       outline: 0;
     }
 
-    &.md-round{
+    &.md-round,
+    &.md-round.md-fab,
+    &.md-round.md-just-icon{
       border-radius: $border-radius-extreme;
     }
 
@@ -85,7 +89,7 @@
           font-size: 18px;
           margin-top: -2px;
           position: relative;
-          top: 2px;
+          top: 0;
       }
     }
 
@@ -168,7 +172,6 @@
       overflow: hidden;
       position: relative;
       line-height: 41px;
-      border-radius: 50%;
     }
 
     .md-button-content{
@@ -219,4 +222,32 @@
             color: $gray;
         }
     }
+}
+
+.button-container{
+  display: flex;
+  align-items: center;
+}
+
+.md-group>.md-group:not(:last-child)>.md-button, .md-group>.md-button:not(:last-child):not(.dropdown-toggle){
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+}
+
+.md-group>.md-group:not(:first-child)>.md-button,
+.md-group>.md-button:not(:first-child){
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+}
+
+.md-group{
+  display: inline-flex;
+  vertical-align: middle;
+
+  .md-button{
+    min-width: auto !important;
+    width: auto !important;
+    margin-left: 0;
+    margin-right: 0;
+  }
 }

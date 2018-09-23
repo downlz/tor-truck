@@ -21,8 +21,17 @@ body {
   }
 }
 
-.wrapper{
+html *{
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
 
+
+.wrapper{
+  position: relative;
+  top: 0;
+  height: 100vh;
+  
     &.wrapper-full-page{
         height: auto;
         min-height: 100vh;
@@ -40,25 +49,9 @@ blockquote{
     background: #FFFFFF;
 }
 
-body, h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4 {
-  font-family: $font-family-sans-serif;
-  font-weight: 300;
-  line-height: 1.5em;
-}
 
 .serif-font{
     font-family: $font-family-serif;
-}
-
-.page-header {
-    height: 60vh;
-    background-position: center center;
-    background-size: cover;
-    margin: 0;
-    padding: 0;
-    border: 0;
-    border-bottom-left-radius: 6px;
-    border-bottom-right-radius: 6px;
 }
 
 a{
@@ -80,12 +73,15 @@ a{
   }
 }
 
-a[data-toggle="collapse"][aria-expanded="true"] .caret{
+a[data-toggle="collapse"][aria-expanded="true"] .caret,
+.md-focused .md-select  .md-icon.md-icon-image svg{
     @include rotate-180();
 }
 
 .sidebar .nav a,
 .caret,
+.md-select .md-icon.md-icon-image svg,
+.md-collapse .md-icon,
 .sidebar .dropdown .dropdown-menu li a{
     @include transition($fast-transition-time, $transition-ease-in);
 }
@@ -134,14 +130,15 @@ input[type="file"] > input[type="button"]::-moz-focus-inner {
 }
 
 .text-center{
-  text-align: center;
+  justify-content: center;
 }
 .text-left{
-  text-align: left;
+  justify-content: flex-start;
 }
 .text-right{
-  text-align: right;
+  justify-content: flex-end;
 }
+
 .places-buttons{
   .md-button{
     width: 30%;
@@ -152,4 +149,66 @@ input[type="file"] > input[type="button"]::-moz-focus-inner {
 
 .md-theme-default :not(input):not(textarea)::selection{
   background-color: #c8c8c8 !important;
+}
+
+#worldMap{
+  width: 100%;
+}
+
+.map{
+  height: 300px;
+}
+
+h1, h2, h3,
+h4, h5, h6 {
+    @extend %headings;
+}
+
+.md-ripple span.md-ripple-wave{
+  border-radius: 50% !important;
+}
+
+.md-ripple{
+  -webkit-mask-image: none;
+  overflow: visible;
+
+  > span{
+    overflow: hidden;
+    position:absolute;
+    top:0;
+    left:0;
+    width:100%;
+  }
+}
+
+.md-toolbar .md-list .md-list-item-content.md-ripple {
+  overflow: hidden;
+}
+
+.md-icon.md-theme-default.md-icon-image svg {
+  fill: $black-color;
+}
+
+.black-color{
+  color: $black-color !important;
+}
+
+.mt-4{
+  margin-top: 1.5rem!important;
+}
+
+.ml-auto,
+.mx-auto {
+  margin-left: auto !important;
+}
+
+.mr-auto,
+.mx-auto {
+  margin-right: auto!important;
+}
+
+small,
+.small{
+  font-size: 80%;
+  font-weight: 400;
 }

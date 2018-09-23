@@ -112,7 +112,7 @@
 }
 
 @mixin shadow-big(){
-    box-shadow: 0 10px 30px -12px rgba(0, 0, 0, $mdb-shadow-key-penumbra-opacity * 3),
+    box-shadow: 0 16px 38px -12px rgba(0, 0, 0, $mdb-shadow-key-penumbra-opacity * 4),
     0  4px 25px 0px rgba(0, 0, 0, $mdb-shadow-ambient-shadow-opacity),
     0  8px 10px -5px rgba(0, 0, 0, $mdb-shadow-key-umbra-opacity);
 }
@@ -130,9 +130,20 @@
 
 }
 
-// shadow backup for Sketch/Photoshop
-// @mixin shadow-big-color($color){
-//     box-shadow: 0 16px 38px -12px rgba($color, $mdb-shadow-key-penumbra-opacity * 4),
-//     0  4px 25px 0px rgba($color, $mdb-shadow-ambient-shadow-opacity),
-//     0  8px 10px -5px rgba($color, $mdb-shadow-key-umbra-opacity);
-// }
+@mixin shadow-big-image(){
+    // new box shadow optimized for Tables and Phones
+    box-shadow: 0 5px 15px -8px rgba(0, 0, 0, $mdb-shadow-ambient-opacity * 2),
+    0  8px 10px -5px rgba(0, 0, 0, $mdb-shadow-umbra-opacity);
+}
+
+@mixin shadow-navbar-color($color){
+    // new box shadow optimized for Tablets and Phones
+
+    @if($color == $white-color) {
+        box-shadow: 0 4px 18px 0px rgba(0, 0, 0, .12),
+                    0 7px 10px -5px rgba(0,0,0, 0.15);
+    }@else{
+        box-shadow: 0 4px 20px 0px rgba(0, 0, 0, .14),
+                    0 7px 12px -5px rgba($color, 0.46);
+    }
+}
