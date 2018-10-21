@@ -128,7 +128,22 @@ var driNew = mongoose.model('Drivers')
     };
 
     module.exports.getDriversDetails = async function(req,res){
-      res.send({
-        message: `Trying Driver between ${req.body.source} and ${req.body.destination} Allocations`
-      })
+      var driverId = req.params.driversId
+      if (driverId) {
+        driNew
+          .findOne({phone : driverId})
+          .exec((err, driver) => {
+              if (err || driver == null){
+                res
+                  .status(404)
+                  .json({
+                    "message": "No driver found"
+                  })
+              } else {
+                res
+                  .status(200)
+                  .json({driver})
+              }
+          })
+        }
     }

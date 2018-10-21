@@ -4,7 +4,7 @@ var tripLog = mongoose.model('Trip')
 module.exports.tripStatus = async function(req, res) {
   val = req.params.stat
   res.send({
-    message: `Shows tripSatus` + val
+    message: `Shows tripSatus ` + new Date()
   })
 }
 
