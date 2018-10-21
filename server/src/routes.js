@@ -1,5 +1,6 @@
 const allocationsController = require('./controllers/AllocationsController')
 const driversController = require('./controllers/DriversController')
+const operatorController = require('./controllers/OperatorConstroller')
 const authenticationControllerPolicy = require('./policies/AuthenticationControllerPolicy')
 const registerController = require('./controllers/RegisterController')
 const networkController = require('./controllers/NetworkController')
@@ -15,14 +16,14 @@ module.exports = (app) =>{
   app.get('/Allocations/:allocationsId/destination/:destination/confirm/:isConfirm',allocationsController.confirmAllocation)
   app.get('/Allocations/:ownerId/allocHistory',allocationsController.ownerAllocHistory)
   app.get('/Allocations/:allocationsId/drivers/:driverId/status',allocationsController.driverStatus)
-  app.get('/Allocations/:allocationsId/drivers/:driverId/status',allocationsController.driverStatus)
   app.get('/Allocations/tripConfirmJob',allocationsController.tripConfirmJob)
+  app.get('/Canceltrip/:allocationsId',allocationsController.cancelTrip)
 
   app.get('/Trip/:tripid/status/:stat',tripController.tripStatus)
   app.get('/Trip/:tripid/finish',tripController.tripComplete)
 
   // Driver Route Requests
-  app.get('/Drivers/:driverId',driversController.getDriversDetails)
+  app.get('/Drivers/:driversId',driversController.getDriversDetails)
   //app.post('/Drivers',authenticationCo;ntrollerPolicy.newDrivers,driversController.newDrivers)
   app.post('/Drivers',driversController.newDrivers)
   app.post('/Drivers/:driversId/preferrednodes',driversController.addPreferredNodes)
@@ -34,7 +35,15 @@ module.exports = (app) =>{
   app.put('/Network/:networkId',networkController.updNetwork)
   app.put('/Network/:networkId/nodes/:nodesId',networkController.updNodes)
 
-app.get('/register/:driverId',registerController.fetchDriverList)
+  app.get('/register/:driverId',registerController.fetchDriverList)
+
+  // Operator Route Requests
+  app.get('/Operator/:operatorId',operatorController.getOperatorDetails)
+  app.get('/Operator/:operatorId/fleet/:fleetId',operatorController.getFleetStatus)
+  app.post('/Operator',operatorController.newOperator)
+  app.post('/Operator/:operatorId/addfleet',operatorController.addFleet)
+  app.put('/Operator/:operatorId',operatorController.updOperator)
+
   // user List Routes
   // Improved Syntax
   /* app.route('/rooms')

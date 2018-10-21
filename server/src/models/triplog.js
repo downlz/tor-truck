@@ -9,6 +9,7 @@ var tripZone = new mongoose.Schema ({
 
 // Trip Status
 var tripStatus = new mongoose.Schema ({
+  status : String,                     //TENTATIVE,ALLOCATED,CANCELLED,ENROUTE,COMPLETED,DELAYED
   requestedon : Date,
   isconfirmed : {type : Boolean, "default" : false},
   confirmedon : Date,

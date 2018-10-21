@@ -15,8 +15,8 @@ const child_process = require("child_process");
 var _ = require('lodash')
 var currentSysTime = (new Date).getTime() + 24*3600*1000
 var maxTripTime = (new Date).getTime() + 7*24*3600*1000
-
 var dateForOneDay = (new Date).getTime() + 6*24*3600*1000
+var tripstatusval = ''
 
 // var currentSysTime = ''
 driverSelectedForRoute = []
@@ -176,7 +176,7 @@ module.exports.getAllocations = async function(req, res,callback) {
                        assignedRouteDrivers : driverSelectedForRoute,
                        cost : '100',
                        zones : 'TBD',
-                       tripstatus : 'Dummy',
+                       tripstatus : tripstatusval,
                        driverAllocated : driverAllocationComplete     // to be used to raise a flag
                      }
                  res
@@ -507,6 +507,7 @@ const fetchDriverOnPath = (path,movingTo,tripDate) => {
                         if (err) {
                           reject(err)
                         } else {
+                          console.log("Driver trip Log Saved " + tripid)
                           resolve(driverOutMsg)
                         }
                       })
@@ -525,13 +526,16 @@ const addTripLog = (tripJSON) => {
         if ((myEpoch - currTime)/3600 > 24){
             isconfirmed = false
             confirmedon = ''
+            tripstatusval = 'TENTATIVE'
         } else {
             isconfirmed = true
             confirmedon = + new Date()
+            tripstatusval = 'ALLOCATED'
         }
         if (tripJSON.tripid) {
           var thisTripStatus = {
               requestedon : new Date(+ new Date()),
+              status : tripstatusval,                          // Use Variable
               isconfirmed : isconfirmed,
               confirmedon : new Date(confirmedon),          // To trace at what time this was confirmed.
               isontrip : false,
@@ -578,7 +582,7 @@ const addTripLog = (tripJSON) => {
                 if (err) {
                   reject(err)
                 } else {
-                  console.log("Trip Log Saved")
+                  console.log("Trip Log Saved " + tripJSON.tripid)
                   resolve(outMsg)
                 }
               })
@@ -591,10 +595,13 @@ const addTripLog = (tripJSON) => {
 
   module.exports.tripConfirmJob = async function(req, res) {
     tripLog
-    .findOne({$and : [{tripstarttime :{ $lt : new Date(dateForOneDay)}},{'tripstatus.isconfirmed':false}]}) //Very important select driver based on trip request date
+    .findOne({$and : [{tripstarttime :{ $lt : new Date(dateForOneDay)}},{"tripstatus.status":'TENTATIVE'}]}) //Very important select driver based on trip request date
     .exec((err, tripConfirm) => {
       if (err) {
         console.log('No trips for confirmation found.Relaxxx')
+        res
+          .status(200)
+          .json({"message" : "No Trip to confirm"})
       } else {
         if (tripConfirm){
           tripConfirmIDs(tripConfirm)
@@ -611,7 +618,6 @@ const addTripLog = (tripJSON) => {
   // })
 
   const tripConfirmIDs = async function(idsToConfirm) {
-
       var allocId = idsToConfirm.triproutestart
       var destination = idsToConfirm.triprouteend
       var tripSDate = new Date(idsToConfirm.tripstarttime) // Your timezone!
@@ -643,12 +649,106 @@ const addTripLog = (tripJSON) => {
 
   var callAllocationAPI = (routeOrigin,routeDestination,tripDatePlan) => {
   return new Promise((resolve,reject) => {
-  request("http://localhost:8081/Allocations/"+routeOrigin+"/destination/"+routeDestination+"/tripdate/"+tripDatePlan, function(err, res, body) {
+    // console.log(tripDatePlan)
+  request("http://localhost:8082/Allocations/"+routeOrigin+"/destination/"+routeDestination+"/tripdate/"+tripDatePlan, function(err, res, body) {
       if(!err && res.statusCode == 200) { // Successful response.Date passes in above API is in GMT zone.
           resolve (body)
       } else {
-          reject('ERROR')      // Catch error if API trip date already passed.
+          // console.log("I am here")
+          // reject('ERROR')      // Catch error if API trip date already passed.
+          console.log(body)
+          resolve (body)          // Shows appropriate message
+          process.on('unhandledRejection', err => { throw err })
+
       }
   })
 })
+}
+
+
+module.exports.cancelTrip = async function(req, res) {
+  var tripCancelID = req.params.allocationsId
+  var emptyresponse = true
+  if (tripCancelID){
+  tripLog
+  .find({$and : [{tripid : tripCancelID},{"tripstatus.status" : "ALLOCATED"}] }) //Very important select driver based on trip request date
+  .exec((err, tripToCancel) => {
+    if (err) {
+      console.log("Recevied an error")
+    } else {
+      if (tripToCancel && tripToCancel.length > 0){
+      tripLog.updateOne({tripid : tripCancelID},{"$set" : {"tripstatus.status" : "CANCELLED"}})
+      .exec((err,deleteConfirm) => {
+        if (err) {
+          console.log("Test Failed")
+        } else {
+          console.log("Passed")
+        }
+      })
+      emptyresponse = false
+    }
+  }
+  })
+}
+
+  const cancelDriverTripRes = await cancelDriverTrip(tripCancelID)
+  if (typeof cancelDriverTripRes !== 'undefined' && cancelDriverTripRes){
+    res
+      .status(200)
+      .json({cancelDriverTripRes})
+  } else {
+    res
+      .status(400)
+      .json("Failed to query");
+  }
+}
+
+var cancelDriverTrip = (tripid) => {
+return new Promise((resolve,reject) => {
+  driverDetails
+    .find({"triplogs.tripid" : tripid},{'triplogs.$':1})
+    .exec((err,routeendtimeDoc)  => {
+      if (err) {
+        console.log("Recevied an error")
+        reject("Not Found")
+      } else {
+        routeendtimeDoc.forEach(function(doc){
+          driverDetails
+          // Delete driver's confirmed trip log
+            .update({_id: doc._id},
+                  { $pull: { "triplogs" : { _id : doc.triplogs[0]._id }}})
+            .exec((err,deleteConfirm) => {
+              if (err) {
+                console.log("Failed to delete entry.Operation aborted")
+              } else {
+                driverDetails
+                  .find({_id: doc._id})
+                  .exec((err,updConfirm) => {
+                    if (err) {
+                      console.log("Unable to fetch the correct value")
+                    } else {
+                      var arr = updConfirm[0].triplogs
+                      // updConfirm.lastservedason = arr[arr.length-1].tripendtime
+                      // updConfirm.lastservedlocation = arr[arr.length-1].routeend
+                      // console.log(arr[arr.length-1].tripendtime + " " + arr[arr.length-1].routeend)     // Check in future if it always pulls up data in correct order
+                      driverDetails.updateOne({_id: doc._id},{"$set" : {
+                                              "lastservedason" : arr[arr.length-1].tripendtime,
+                                              "lastservedlocation" : arr[arr.length-1].routeend
+                                              }})
+                      .exec((err,updConfirm) => {
+                          if (err) {
+                            console.log("Update to set old location failed")
+                          } else {
+                             console.log("Update passed successfully")
+                          }
+                      })
+                    }
+                  })
+                }
+              })
+            })
+            resolve(routeendtimeDoc)
+          }
+        })
+      })
 }
