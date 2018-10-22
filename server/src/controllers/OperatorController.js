@@ -64,7 +64,7 @@ var fleetOperator = mongoose.model('fleetOperator')
       }
     };
 
-    module.exports.addfleet = async function(req, res) {
+    module.exports.addFleet = async function(req, res) {
       existingFleetFound = false
       var operatorId = req.params.operatorId // .toString();
       if (operatorId) {
@@ -146,12 +146,12 @@ var fleetOperator = mongoose.model('fleetOperator')
 
     module.exports.getFleetStatus = async function(req,res){
       var operatorId = req.params.operatorId
-      var vehicleno = req.params.vehicleno
+      var vehicleno = req.params.fleetId
       if (operatorId) {
         fleetOperator
           .find({"fleetdetails.vehicleno" : vehicleno},{'fleetdetails.$':1})
           .exec((err, operator) => {
-              if (err || driver == null){
+              if (err || operator == null){
                 res
                   .status(404)
                   .json({

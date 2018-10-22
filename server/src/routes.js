@@ -1,6 +1,6 @@
 const allocationsController = require('./controllers/AllocationsController')
 const driversController = require('./controllers/DriversController')
-const operatorController = require('./controllers/OperatorConstroller')
+const operatorController = require('./controllers/OperatorController')
 const authenticationControllerPolicy = require('./policies/AuthenticationControllerPolicy')
 const registerController = require('./controllers/RegisterController')
 const networkController = require('./controllers/NetworkController')

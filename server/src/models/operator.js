@@ -3,8 +3,8 @@ var mongoose = require( 'mongoose' );
 
 var fleetdetails = new mongoose.Schema ({
   vehicleno : String,
-  vehicletype : Date,
-  baselocation : Date,
+  vehicletype : String,
+  baselocation : String,
   permit : String,      //National or State
   currentlocation : String,
   lastservedlocation : String,
@@ -12,8 +12,8 @@ var fleetdetails = new mongoose.Schema ({
 })
 
 var operatorSchema = new mongoose.Schema ({
-  orgname : {type : String,required : true},
-  phone : {type : String,unique : true},
+  orgname : {type : String},
+  phone : {type : String},
   address : String,
   email : String,
   operatingzone : [String],
