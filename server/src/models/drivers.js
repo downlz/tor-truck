@@ -11,18 +11,54 @@ var workTimeSchema = new mongoose.Schema ({
 var spiSchema = new mongoose.Schema ({
   license : {type : String,required : true},
   family : [String],
-  aadharno : {type : Number,required : true}
+  aadharno : {type : Number,required : true,unique : true}
+})
+
+// Driver Preferred routes
+var preferredNodes = new mongoose.Schema ({
+  nodestart : {type : String,required : true,index: true},
+  nodeend : {type : String,required : true,index: true},
+  distance : {type : Number,required : true},
+  cost: {type : Number},                          // Cost parameter will help to move drivers to his home location
+  isactive : {type : Boolean, required : true}
+})
+// preferredNodes.index({nodestart: 1, nodeend: 1,type: -1})
+
+var driverStatus = new mongoose.Schema ({
+  isonactivetrip : {type : Boolean, "default" : false},
+  lasttripstarttime : Date,
+  lasttripendtime : Date,
+  lastservedlocation : String,
+  currenttripstarttime : Date,
+  currenttripendtime : Date,
+  tripid : String,           // Attach to triplog
+  nextshift : Date,
+  currentlocation : {type : String},      // Update in realtime
+  nextplannedroute : {}
+})
+
+var driverTripLog = new mongoose.Schema ({
+  tripid : String,
+  tripstarttime : Date,
+  tripendtime : Date,
+  routestart : String,
+  routeend : String
 })
 
 var driverSchema = new mongoose.Schema ({
   drivername : {type : String,required : true},
-  phone : [String],
+  phone : {type : String,unique : true},
   address : String,
   baselocation : {type : String,required : true},
-  lastservedlocation : {type : String},
-  zones : [String],
-  preferrednodes : [String],
-  workTimes : workTimeSchema
-});
+  lastservedlocation : {type : String,required : true}, // To be updated once driver completes his trip, can also be updated based on trip allocation
+  lastservedason : {type : Date,default: +new Date()},  // To be updated based on trip allocation
+  zones : [ String ],
+  preferrednodes : [preferredNodes],
+  workTimes : workTimeSchema,
+  driverStatus : {driverStatus},
+  isassigned : {type : Boolean, "default" : false},
+  triplogs : [driverTripLog]            // Pull user details from triplog
+})
+//driverSchema.index({phone: 1, preferrednodes.nodestart: 1,'preferrednodes.nodeend': 1}, {unique: true})
 
 mongoose.model('Drivers',driverSchema);
