@@ -1,0 +1,4 @@
+test/unit/index.js
+test/unit/karma.conf.js
+src/pages/Dashboard/
+src/routes/

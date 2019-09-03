@@ -1,5 +1,6 @@
 var mongoose = require('mongoose')
 //  var dbURI = 'mongodb://localhost/loc8r';
+process.env.TZ = 'Asia/Kolkata'
 var dbURI = 'mongodb://admin:mevn2019@ds129811.mlab.com:29811/tortruck-dev'
 if (process.env.NODE_ENV === 'production') {
   dbURI = 'mongodb://admin:mevn2019@ds129811.mlab.com:29811/tortruck-dev'
@@ -45,3 +46,5 @@ process.on('SIGTERM', function () {
 require('./drivers')
 require('./network')
 require('./register')
+require('./triplog')
+require('./operator')
